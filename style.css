@@ -4,14 +4,11 @@ header {
 }
 img {
     max-width: 250px;
+    margin-bottom: 20px;
 }
-.recherche {
-    margin-top: 10px;
-    margin-left: auto;
-    margin-right: auto;
-}
+
 #search-form {
-    width: 95%;
+    width: 93%;
     margin: 0 auto;
     position: relative;
 }
@@ -41,7 +38,7 @@ img {
 }
 
 .btn-group {
-    margin-left: 2%;
+    margin-left: 3%;
 }
 
 .btn1,.btn2,.btn3 {
