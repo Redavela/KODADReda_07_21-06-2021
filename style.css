@@ -1,0 +1,47 @@
+header {
+    margin-top: 10px;
+    margin-bottom: 50px;
+}
+img {
+    max-width: 250px;
+    margin-bottom: 20px;
+}
+
+#search-form {
+    width: 93%;
+    margin: 0 auto;
+    position: relative;
+}
+#search-input {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 1.4rem 0rem;
+    background-color: #E7E7E7;
+    border: white solid 1px;
+    border-radius: 7px;
+    font-size: 1rem;
+}
+#search-input::placeholder {
+    padding-left: 2rem;
+}
+#submit-btn {
+    position: absolute;
+    right: 0.3rem;
+    top: 1em;
+    background-color: #E7E7E7;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+.fa-search{
+    font-size: 1.rem;
+}
+
+.btn-group {
+    margin-left: 3%;
+}
+
+.btn1,.btn2,.btn3 {
+    margin: 5px;
+    height: 60px;
+}
