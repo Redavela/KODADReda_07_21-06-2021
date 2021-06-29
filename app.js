@@ -24,5 +24,16 @@ function createCard(){
             </div>
         </div>
         `).join('')
-}
+} 
 createCard()
+
+
+function algoRecherche(combinaisons, text){
+    let result = {}
+    for(let combinaison of combinaisons)
+    {
+        result[combinaison] = []
+    }
+    
+    return result  
+}
