@@ -31,8 +31,11 @@ createCard()
 function algoRecherche(combinaisons, text){
     let result = {}
     for(let combinaison of combinaisons)
-    {
-        result[combinaison] = []
+    {   
+
+        result[combinaison] =  recipes.filter(recipe =>{
+              recipe[combinaison].toLowerCase().includes(recipe[text]).toLowerCase()
+            })
     }
     
     return result  
