@@ -30,13 +30,32 @@ createCard()
 
 function algoRecherche(combinaisons, text){
     let result = {}
-    for(let combinaison of combinaisons)
-    {   
 
-        result[combinaison] =  recipes.filter(recipe =>{
-              recipe[combinaison].toLowerCase().includes(recipe[text]).toLowerCase()
-            })
+    let visite = [{ key: "recipes", value: recipes, parent: null }]
+
+    while(visite.length !== 0 ){
+        let current = visite.pop()
+        if(typeof current.value === 'object' || Array.isArray(current.value) ){
+            for(const key in current.value){
+                visite.push({
+                    key,
+                    value:current.value[key],
+                    parent:current
+                })
+            }
+        }
+        
+        else if(typeof current.value === 'string'){
+            for(const combinaison of combinaisons){
+                if(current.key === combinaison){
+                    if(current.value.toLowerCase().includes(text.toLowerCase())){
+                        result[combinaison] = result[combinaison] || []
+                        result[combinaison].push(current)
+                    }
+                }
+            }
+
+        }
     }
-    
     return result  
 }
