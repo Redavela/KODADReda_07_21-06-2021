@@ -92,11 +92,11 @@ border-radius: 5px 5px 0 0;
     display: inline-block;
     width: 50%;
     vertical-align: top;
-    font-size: .8rem;
+    font-size: .6rem;
     padding-right: 5px;
 }
 .card-text {
     display: inline-block;
     width: 48%;
-    font-size: .9rem;
+    font-size: .6rem;
 }
