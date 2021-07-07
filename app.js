@@ -26,3 +26,39 @@ function createCard(){
         `).join('')
 }
 createCard()
+
+class Tree{
+    constructor(elements){
+        this.tree = {}
+        this.objectExplorer(elements)
+        console.log(this.tree);
+    }
+    addToTree(node){
+        let currentTree = this.tree
+        for(const letter of node){
+            currentTree[letter] = currentTree[letter] || {}
+            currentTree = currentTree[letter]
+         }
+    }
+    objectExplorer(node){
+        if(node){
+            if(typeof node === 'object' || Array.isArray(node) ){
+                for(const key in node){
+                    this.objectExplorer(node[key])
+                }
+            }
+            else if(typeof node === 'string' && isNaN(parseFloat(node))){
+                const words = node.split(" ")
+                for(const word of words){
+                    this.addToTree(word.toLowerCase())
+                }
+            }
+        }
+   }
+} 
+
+
+
+function algoRechercheArbre(){
+    const tree = new Tree(recipes)
+}
