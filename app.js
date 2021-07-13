@@ -1,6 +1,5 @@
 
 const container = document.querySelector('.row')
-const searchInput = document.getElementById('search-input')
 const searchButton = document.getElementById('submit-btn')
 let searchTerm = ''
 function createCard(){
@@ -62,9 +61,10 @@ function algoRecherche(combinaisons, text){
     return result  
 }
 
-searchInput.addEventListener('input', (e) =>{
-    searchTerm = e.target.value
+
+
+searchButton.addEventListener('click',(e)=>{
+    const searchInput = document.getElementById('search-input')
+    algoRecherche(['name','ingredients','description'], searchInput.value)
 
 })
-
-searchButton.addEventListener('click', algoRecherche())
