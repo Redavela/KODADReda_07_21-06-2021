@@ -14,7 +14,7 @@ class AutoComplete {
     this.render();
   }
 
-  setChipsEventFunction(fn){
+  setChipsEventFunction(fn) {
     this.chipsEventFunction = fn
   }
 
@@ -26,7 +26,9 @@ class AutoComplete {
     }
     // trie sur les recettes qu'on a spécifié
     for (const item in this.items) {
-      if (this.items[item].find((e) => this.constraints.includes(e))) {
+      if (this.items[item].find((e) =>
+          this.constraints.includes(e)
+        )) {
         keys.push(item);
       }
     }
@@ -60,10 +62,18 @@ class AutoComplete {
     }
   }
 
+  getConstraints() {
+    let chipsConstraints = this.chips.map(chip => this.items[chip]) || []
+    if (chipsConstraints.length === 0) {
+      return [];
+    }
+    return [...new Set(chipsConstraints.reduce((a, e) => a.concat(e)))]
+  }
+
   addToChips(label) {
     this.chips.push(label);
 
-    this.chipsEventFunction(this.chips.map(chip=>this.items[chip]));
+    this.chipsEventFunction(this.getConstraints());
 
     this.filteredItems.splice(this.filteredItems.indexOf(label), 1);
 
@@ -75,7 +85,10 @@ class AutoComplete {
     if (label.includes(this.text)) {
       this.filteredItems.push(label);
     }
+
     this.chips.splice(this.chips.indexOf(label), 1);
+
+    this.chipsEventFunction(this.getConstraints());
 
     this.generateChips();
     this.generateList();
@@ -107,13 +120,15 @@ class AutoComplete {
     this.removeChildren(dom);
 
     this.filteredItems.forEach((item) => {
+      const container = document.createElement("div");
       const elem = document.createElement("button");
 
       elem.innerText = item;
       elem.onclick = () => {
         this.addToChips(item);
       };
-      dom.appendChild(elem);
+      container.appendChild(elem);
+      dom.appendChild(container);
     });
   }
 
@@ -123,9 +138,9 @@ class AutoComplete {
     <div class="ac-chips ${this.color}">
     </div>
     <div class="ac ${this.color}">
-    <div class="ac-header ${this.color} row">
-    <input type="text" placeholder="${this.title}" class="col" />
-    <i class="fas fa-chevron-down col-2"></i>
+    <div class="ac-header ${this.color} row justify-content-between">
+    <div class='col-11'><input type="text" placeholder="${this.title}" /></div>
+    <div class='col-1'> <i class="fas fa-chevron-down "></i></div>
     </div>
     <div class="ac-body ${this.color}">
     </div>
@@ -141,7 +156,7 @@ class AutoComplete {
     dom.addEventListener("input", (e) => {
       const text = e.target.value;
       const arrow = document.querySelector(`${this.id} i`);
-      
+
       this.text = text;
       if (!this.showList) {
         // affiche la liste lorsque l'on écrit du texte dans le dropdown
@@ -165,9 +180,9 @@ class AutoComplete {
   toggleDropdown(e) {
     this.showList = !this.showList;
     e.style.transform = `rotate(${180 * +this.showList}deg)`;
-    document.querySelector(`${this.id} .ac-body`).style.display = this.showList
-      ? "flex"
-      : "none";
+    document.querySelector(`${this.id} .ac-body`).style.display = this.showList ?
+      "flex" :
+      "none";
   }
 
   generateDropdown() {
@@ -184,5 +199,86 @@ class AutoComplete {
     this.generateList();
     this.generateDropdown();
     this.generateInput();
+  }
+}
+
+class Filters {
+  constructor() {
+    this.constraints = []
+
+    this.ingredientsAutocomplete = new AutoComplete(
+      this.generateIngredientsList(),
+      "#ingredients",
+      "blue",
+      "Ingrédients"
+    );
+
+   this.appareilsAutocomplete = new AutoComplete(
+      this.generateApplianceList(),
+      "#appareils",
+      "green",
+      "Appareil"
+    );
+
+   this.ustensilesAutocomplete = new AutoComplete(
+      this.generateUstensilesList(),
+      "#ustensiles",
+      "red",
+      "Ustensiles"
+    );
+
+    this.ingredientsAutocomplete.setChipsEventFunction((constraints) => {
+      this.appareilsAutocomplete.updateConstraints(constraints)
+      this.ustensilesAutocomplete.updateConstraints(constraints)
+    })
+
+    this.appareilsAutocomplete.setChipsEventFunction((constraints) => {
+      this.ingredientsAutocomplete.updateConstraints(constraints)
+      this.ustensilesAutocomplete.updateConstraints(constraints)
+    })
+
+    this.ustensilesAutocomplete.setChipsEventFunction((constraints) => {
+      this.ingredientsAutocomplete.updateConstraints(constraints)
+      this.appareilsAutocomplete.updateConstraints(constraints)
+    })
+  }
+
+
+  generateIngredientsList() {
+    let ingredients = {}
+
+    recipes.forEach((recipe, index) => {
+      recipe.ingredients.forEach(ingredientObj => {
+        const ingredient = ingredientObj.ingredient.toLowerCase()
+        ingredients[ingredient] = ingredients[ingredient] || []
+        ingredients[ingredient].push(index)
+      })
+    });
+    return ingredients
+  }
+
+  generateApplianceList() {
+    let appareils = {}
+
+    recipes.forEach((recipe, index) => {
+      const appareil = recipe.appliance.toLowerCase()
+      appareils[appareil] = appareils[appareil] || []
+      appareils[appareil].push(index)
+    });
+    return appareils
+  }
+
+  generateUstensilesList() {
+    let ustensiles = {}
+
+    recipes.forEach((recipe, index) => {
+      recipe.ustensils.forEach(ustensile => {
+        ustensile = ustensile.toLowerCase()
+        ustensiles[ustensile] = ustensiles[ustensile] || []
+        ustensiles[ustensile].push(index)
+      })
+
+    });
+    return ustensiles
   }
 }
