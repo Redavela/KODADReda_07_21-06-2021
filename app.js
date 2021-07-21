@@ -67,7 +67,7 @@ function algoRecherche(combinaisons, text){
 searchButton.addEventListener('click',(e)=>{
     const searchInput = document.getElementById('search-input')
     algoRecherche(['name','ingredients','description'], searchInput.value)
-
+})
 createCard()
 
 function generateIngredientsList(){
@@ -132,4 +132,4 @@ const ustensilesAutocomplete = new AutoComplete(
 
 ingredientsAutocomplete.setChipsEventFunction((constraints)=>{
     appareilsAutocomplete.updateConstraints(constraints)
-})
+});
