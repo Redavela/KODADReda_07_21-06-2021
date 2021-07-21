@@ -1,5 +1,5 @@
 
-const container = document.querySelector('.row')
+const container = document.querySelector('.container')
 
 function createCard(){
     container.innerHTML = recipes.map(recette =>
@@ -26,3 +26,67 @@ function createCard(){
         `).join('')
 }
 createCard()
+
+function generateIngredientsList(){
+    let ingredients = {}
+    
+    recipes.forEach((recipe,index) => {
+        recipe.ingredients.forEach(ingredientObj =>{
+            const ingredient = ingredientObj.ingredient.toLowerCase()
+            ingredients[ingredient] = ingredients[ingredient]||[]
+            ingredients[ingredient].push(index)
+        })
+    });
+    return ingredients
+}
+
+function generateApplianceList(){
+    let appareils = {}
+    
+    recipes.forEach((recipe,index) => {
+        const appareil = recipe.appliance.toLowerCase()
+        appareils[appareil] = appareils[appareil]||[]
+        appareils[appareil].push(index)
+    });
+    return appareils
+} 
+
+function generateUstensilesList(){
+    let ustensiles = {}
+    
+    recipes.forEach((recipe,index) => {
+        recipe.ustensils.forEach(ustensile=>{
+        ustensile = ustensile.toLowerCase()
+        ustensiles[ustensile] = ustensiles[ustensile]||[]
+        ustensiles[ustensile].push(index)
+        })
+        
+    });
+    return ustensiles
+}
+
+const ingredientsAutocomplete = new AutoComplete(
+  generateIngredientsList(),
+  "#ingredients",
+  "blue",
+  "Ingrédients"
+);
+
+
+const appareilsAutocomplete = new AutoComplete(
+  generateApplianceList(),
+  "#appareils",
+  "green",
+  "Appareil"
+);
+
+const ustensilesAutocomplete = new AutoComplete(
+  generateUstensilesList(),
+  "#ustensiles",
+  "red",
+  "Ustensiles"
+);
+
+ingredientsAutocomplete.setChipsEventFunction((constraints)=>{
+    appareilsAutocomplete.updateConstraints(constraints)
+})
