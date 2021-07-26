@@ -2,9 +2,13 @@
 const searchButton = document.getElementById('submit-btn')
 let searchTerm = ''
 const container = document.querySelector('.container')
+const filters = new Filters(()=>{  createCard()})
 
 function createCard(){
-    container.innerHTML = recipes.map(recette =>
+    let recipesToUse = recipes.filter(recipe=>filters.constraints.includes(recipe.id) )
+    if(recipesToUse.length ===0){
+        recipesToUse = recipes}
+    container.innerHTML = recipesToUse.map(recette =>
         `
         <div class="card col-sm-12 col-md-offset-2 col-md-8 col-lg-offset-0 col-lg-4 " style="width: 18rem;">
             <div class="card-img"></div>
@@ -29,12 +33,11 @@ function createCard(){
 } 
 createCard()
 
-
 function algoRecherche(combinaisons, text){
     let result = {}
 
     let visite = [{ key: "recipes", value: recipes, parent: null }]
-
+    
     while(visite.length !== 0 ){
         let current = visite.pop()
         if(typeof current.value === 'object' || Array.isArray(current.value) ){
@@ -43,6 +46,7 @@ function algoRecherche(combinaisons, text){
                     key,
                     value:current.value[key],
                     parent:current
+
                 })
             }
         }
@@ -59,14 +63,31 @@ function algoRecherche(combinaisons, text){
 
         }
     }
-    return result  
+    let resConstraints = []
+    for(const key in result){
+        resConstraints = resConstraints.concat(result[key].map(elem=>extractParentId(elem.parent)))
+    }
+    return [...new Set(resConstraints)]  
 }
+
+function extractParentId(parent){
+    let currentParent = parent
+    while(currentParent){
+        if(currentParent?.value?.id){
+            return currentParent.value.id
+        }
+        else{
+            currentParent = currentParent.parent
+        }
+    }
+}
+
 
 searchButton.addEventListener('click',(e)=>{
     e.preventDefault()
     const searchInput = document.getElementById('search-input')
-    console.log(algoRecherche(['name','ingredient','description'], searchInput.value))
+    let result = algoRecherche(['name','ingredient','description'], searchInput.value)
+    filters.updateSearchBarConstraints(result)
+    createCard()
 })
-createCard()
 
-const filters = new Filters()

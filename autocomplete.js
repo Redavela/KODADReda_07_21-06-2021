@@ -203,7 +203,7 @@ class AutoComplete {
 }
 
 class Filters {
-  constructor() {
+  constructor(updateFunction) {
     this.constraints = []
 
     this.ingredientsAutocomplete = new AutoComplete(
@@ -228,19 +228,32 @@ class Filters {
     );
 
     this.ingredientsAutocomplete.setChipsEventFunction((constraints) => {
+      this.constraints.concat(constraints)
+      updateFunction()
       this.appareilsAutocomplete.updateConstraints(constraints)
       this.ustensilesAutocomplete.updateConstraints(constraints)
     })
 
-    this.appareilsAutocomplete.setChipsEventFunction((constraints) => {
+    this.appareilsAutocomplete.setChipsEventFunction((constraints) => {  
+      this.constraints.concat(constraints)
+      updateFunction()
       this.ingredientsAutocomplete.updateConstraints(constraints)
       this.ustensilesAutocomplete.updateConstraints(constraints)
     })
 
-    this.ustensilesAutocomplete.setChipsEventFunction((constraints) => {
+    this.ustensilesAutocomplete.setChipsEventFunction((constraints) => {  
+      this.constraints.concat(constraints)
+      updateFunction()
       this.ingredientsAutocomplete.updateConstraints(constraints)
       this.appareilsAutocomplete.updateConstraints(constraints)
     })
+  }
+
+  updateSearchBarConstraints(constraints){
+    this.constraints = constraints
+    this.ustensilesAutocomplete.updateConstraints(constraints)
+    this.ingredientsAutocomplete.updateConstraints(constraints)
+    this.appareilsAutocomplete.updateConstraints(constraints)
   }
 
 
