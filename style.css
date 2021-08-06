@@ -50,6 +50,9 @@
     margin: 5px;
     padding: 5px;
 }
+.ac-chips {
+    min-height: 20px;
+}
 
 .ac-chips.blue>button {
     background: #3282f7;

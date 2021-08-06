@@ -30,7 +30,7 @@ class AutoComplete {
       if (this.chips.length > 0) {
         if (!this.chips.includes(item)) {
           if (
-            this.items[item].find((e) => this.constraints.includes(e)) !==
+            this.constraints.every((e) => this.items[item].includes(e)) !==
             undefined
           ) {
             keys.push(item);
@@ -38,7 +38,7 @@ class AutoComplete {
         }
       } else {
         if (
-          this.items[item].find((e) => this.constraints.includes(e)) !==
+          this.constraints.every((e) => this.items[item].includes(e)) !==
           undefined
         ) {
           keys.push(item);
@@ -60,7 +60,7 @@ class AutoComplete {
   }
 
   updateConstraints(constraints) {
-    // N affiche que les éléments qui sont présents dans la liste des reccettes specifiées
+    // N affiche que les éléments qui sont présents dans la liste des recettes specifiées
     this.constraints = constraints;
     this.filteredItems = this.getItems();
 

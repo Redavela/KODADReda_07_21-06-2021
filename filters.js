@@ -98,26 +98,36 @@ class Filters {
     this.appareilsAutocomplete.updateConstraints(constraints);
   }
 
+ 
   generateIngredientsList() {
     let ingredients = {};
-
-    recipes.forEach((recipe, index) => {
+    let recipesToUse = recipes.filter((recipe) =>
+    this.constraints.includes(recipe.id)
+    );
+    if (this.constraints.length === 0) {
+      recipesToUse = recipes;
+    }
+    console.log(recipes)
+    console.log(recipesToUse)
+    console.log(this.constraints)
+    recipesToUse.forEach((recipe) => {
       recipe.ingredients.forEach((ingredientObj) => {
         const ingredient = ingredientObj.ingredient.toLowerCase();
         ingredients[ingredient] = ingredients[ingredient] || [];
-        ingredients[ingredient].push(index);
+        ingredients[ingredient].push(recipe.id);
       });
     });
+    console.log(ingredients)
     return ingredients;
   }
 
   generateApplianceList() {
     let appareils = {};
 
-    recipes.forEach((recipe, index) => {
+    recipes.forEach((recipe) => {
       const appareil = recipe.appliance.toLowerCase();
       appareils[appareil] = appareils[appareil] || [];
-      appareils[appareil].push(index);
+      appareils[appareil].push(recipe.id);
     });
     return appareils;
   }
@@ -125,11 +135,11 @@ class Filters {
   generateUstensilesList() {
     let ustensiles = {};
 
-    recipes.forEach((recipe, index) => {
+    recipes.forEach((recipe) => {
       recipe.ustensils.forEach((ustensile) => {
         ustensile = ustensile.toLowerCase();
         ustensiles[ustensile] = ustensiles[ustensile] || [];
-        ustensiles[ustensile].push(index);
+        ustensiles[ustensile].push(recipe.id);
       });
     });
     return ustensiles;
