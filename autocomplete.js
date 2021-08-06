@@ -8,14 +8,14 @@ class AutoComplete {
     this.constraints = [];
     this.filteredItems = Object.keys(items);
     this.chips = [];
-    this.chipsEventFunction = null
+    this.chipsEventFunction = null;
     this.showList = false;
 
     this.render();
   }
 
   setChipsEventFunction(fn) {
-    this.chipsEventFunction = fn
+    this.chipsEventFunction = fn;
   }
 
   getItems() {
@@ -24,12 +24,25 @@ class AutoComplete {
     if (this.constraints.length === 0) {
       return Object.keys(this.items);
     }
+
     // trie sur les recettes qu'on a spécifié
     for (const item in this.items) {
-      if (this.items[item].find((e) =>
-          this.constraints.includes(e)
-        )) {
-        keys.push(item);
+      if (this.chips.length > 0) {
+        if (!this.chips.includes(item)) {
+          if (
+            this.items[item].find((e) => this.constraints.includes(e)) !==
+            undefined
+          ) {
+            keys.push(item);
+          }
+        }
+      } else {
+        if (
+          this.items[item].find((e) => this.constraints.includes(e)) !==
+          undefined
+        ) {
+          keys.push(item);
+        }
       }
     }
     return keys;
@@ -49,7 +62,6 @@ class AutoComplete {
   updateConstraints(constraints) {
     // N affiche que les éléments qui sont présents dans la liste des reccettes specifiées
     this.constraints = constraints;
-
     this.filteredItems = this.getItems();
 
     this.generateChips();
@@ -62,20 +74,34 @@ class AutoComplete {
     }
   }
 
-  getConstraints() {
-    let chipsConstraints = this.chips.map(chip => this.items[chip]) || []
+  getChipsConstraints() {
+    if (this.chips.length === 0) {
+      return [];
+    }
+
+    return this.chips
+      .map((item) => this.items[item])
+      .reduce((c, v) => c.concat(v));
+  }
+
+  getConstraints(chips) {
+    let chipsConstraints = chips.map((chip) => this.items[chip]) || [];
     if (chipsConstraints.length === 0) {
       return [];
     }
-    return [...new Set(chipsConstraints.reduce((a, e) => a.concat(e)))]
+    return [...new Set(chipsConstraints.reduce((a, e) => a.concat(e)))];
   }
 
   addToChips(label) {
+    let old = [...this.chips];
     this.chips.push(label);
 
-    this.chipsEventFunction(this.getConstraints());
-
-    this.filteredItems.splice(this.filteredItems.indexOf(label), 1);
+    this.chipsEventFunction(
+      this.getConstraints(this.chips),
+      this.getConstraints(old),
+      "add"
+    );
+    this.filteredItems = this.getItems();
 
     this.generateChips();
     this.generateList();
@@ -85,10 +111,15 @@ class AutoComplete {
     if (label.includes(this.text)) {
       this.filteredItems.push(label);
     }
+    let old = [...this.chips];
 
     this.chips.splice(this.chips.indexOf(label), 1);
 
-    this.chipsEventFunction(this.getConstraints());
+    this.chipsEventFunction(
+      this.getConstraints(this.chips),
+      this.getConstraints(old),
+      "remove"
+    );
 
     this.generateChips();
     this.generateList();
@@ -180,9 +211,9 @@ class AutoComplete {
   toggleDropdown(e) {
     this.showList = !this.showList;
     e.style.transform = `rotate(${180 * +this.showList}deg)`;
-    document.querySelector(`${this.id} .ac-body`).style.display = this.showList ?
-      "flex" :
-      "none";
+    document.querySelector(`${this.id} .ac-body`).style.display = this.showList
+      ? "flex"
+      : "none";
   }
 
   generateDropdown() {
@@ -199,99 +230,5 @@ class AutoComplete {
     this.generateList();
     this.generateDropdown();
     this.generateInput();
-  }
-}
-
-class Filters {
-  constructor(updateFunction) {
-    this.constraints = []
-
-    this.ingredientsAutocomplete = new AutoComplete(
-      this.generateIngredientsList(),
-      "#ingredients",
-      "blue",
-      "Ingrédients"
-    );
-
-   this.appareilsAutocomplete = new AutoComplete(
-      this.generateApplianceList(),
-      "#appareils",
-      "green",
-      "Appareil"
-    );
-
-   this.ustensilesAutocomplete = new AutoComplete(
-      this.generateUstensilesList(),
-      "#ustensiles",
-      "red",
-      "Ustensiles"
-    );
-
-    this.ingredientsAutocomplete.setChipsEventFunction((constraints) => {
-      this.constraints.concat(constraints)
-      updateFunction()
-      this.appareilsAutocomplete.updateConstraints(constraints)
-      this.ustensilesAutocomplete.updateConstraints(constraints)
-    })
-
-    this.appareilsAutocomplete.setChipsEventFunction((constraints) => {  
-      this.constraints.concat(constraints)
-      updateFunction()
-      this.ingredientsAutocomplete.updateConstraints(constraints)
-      this.ustensilesAutocomplete.updateConstraints(constraints)
-    })
-
-    this.ustensilesAutocomplete.setChipsEventFunction((constraints) => {  
-      this.constraints.concat(constraints)
-      updateFunction()
-      this.ingredientsAutocomplete.updateConstraints(constraints)
-      this.appareilsAutocomplete.updateConstraints(constraints)
-    })
-  }
-
-  updateSearchBarConstraints(constraints){
-    this.constraints = constraints
-    this.ustensilesAutocomplete.updateConstraints(constraints)
-    this.ingredientsAutocomplete.updateConstraints(constraints)
-    this.appareilsAutocomplete.updateConstraints(constraints)
-  }
-
-
-  generateIngredientsList() {
-    let ingredients = {}
-
-    recipes.forEach((recipe, index) => {
-      recipe.ingredients.forEach(ingredientObj => {
-        const ingredient = ingredientObj.ingredient.toLowerCase()
-        ingredients[ingredient] = ingredients[ingredient] || []
-        ingredients[ingredient].push(index)
-      })
-    });
-    return ingredients
-  }
-
-  generateApplianceList() {
-    let appareils = {}
-
-    recipes.forEach((recipe, index) => {
-      const appareil = recipe.appliance.toLowerCase()
-      appareils[appareil] = appareils[appareil] || []
-      appareils[appareil].push(index)
-    });
-    return appareils
-  }
-
-  generateUstensilesList() {
-    let ustensiles = {}
-
-    recipes.forEach((recipe, index) => {
-      recipe.ustensils.forEach(ustensile => {
-        ustensile = ustensile.toLowerCase()
-        ustensiles[ustensile] = ustensiles[ustensile] || []
-        ustensiles[ustensile].push(index)
-      })
-
-    });
-    return ustensiles
   }
 }
