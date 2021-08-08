@@ -6,41 +6,37 @@ class Filters {
   }
 
   mergeConstraints(newConstraints, oldConstraints, type) {
-    let diff = this.arrayDifference(newConstraints, oldConstraints);
+    this.constraints = newConstraints;
+    console.log(this.constraints, newConstraints)
+    // if (type === "add") {
+    //   this.constraints = [
+    //     ...new Set(
+    //       this.constraints
+    //         .filter((c) => newConstraints.includes(c))
+    //         .concat(diff)
+    //     ),
+    //   ];
+    // } else if (type === "remove") {
+    //   this.constraints = this.appareilsAutocomplete.getChipsConstraints();
+    //   if (this.constraints.length === 0) {
+    //     this.constraints = this.ingredientsAutocomplete.getChipsConstraints();
+    //   } else {
+    //     let tc = this.ingredientsAutocomplete.getChipsConstraints();
+    //     if (tc.length > 0) {
+    //       this.constraints = this.constraints.filter((c) => tc.includes(c));
+    //     }
+    //   }
+    //   if (this.constraints.length === 0) {
+    //     this.constraints = this.ustensilesAutocomplete.getChipsConstraints();
+    //   } else {
+    //     let tc = this.ustensilesAutocomplete.getChipsConstraints();
+    //     if (tc.length > 0) {
+    //       this.constraints = this.constraints.filter((c) => tc.includes(c));
+    //     }
+    //   }
 
-    if (this.constraints.length > 0) {
-      diff = diff.filter((d) => this.constraints.includes(d));
-    }
-
-    if (type === "add") {
-      this.constraints = [
-        ...new Set(
-          this.constraints
-            .filter((c) => newConstraints.includes(c))
-            .concat(diff)
-        ),
-      ];
-    } else if (type === "remove") {
-      this.constraints = this.appareilsAutocomplete.getChipsConstraints();
-      if (this.constraints.length === 0) {
-        this.constraints = this.ingredientsAutocomplete.getChipsConstraints();
-      } else {
-        let tc = this.ingredientsAutocomplete.getChipsConstraints();
-        if (tc.length > 0) {
-          this.constraints = this.constraints.filter((c) => tc.includes(c));
-        }
-      }
-      if (this.constraints.length === 0) {
-        this.constraints = this.ustensilesAutocomplete.getChipsConstraints();
-      } else {
-        let tc = this.ustensilesAutocomplete.getChipsConstraints();
-        if (tc.length > 0) {
-          this.constraints = this.constraints.filter((c) => tc.includes(c));
-        }
-      }
-
-      this.constraints = [...new Set(this.constraints)];
-    }
+    //   this.constraints = [...new Set(this.constraints)];
+    // }
     this.updateFunction();
     this.ingredientsAutocomplete.updateConstraints(this.constraints);
     this.appareilsAutocomplete.updateConstraints(this.constraints);
@@ -79,6 +75,7 @@ class Filters {
 
     this.appareilsAutocomplete.setChipsEventFunction(
       (newConstraints, oldConstraints, type) => {
+        console.log(this.constraints, newConstraints, 'test before merge')
         this.mergeConstraints(newConstraints, oldConstraints, type);
       }
     );

@@ -20,26 +20,23 @@ class AutoComplete {
 
   getItems() {
     let keys = [];
-    //
     if (this.constraints.length === 0) {
+      console.log(this.items, 'ici')
       return Object.keys(this.items);
     }
-
     // trie sur les recettes qu'on a spécifié
     for (const item in this.items) {
       if (this.chips.length > 0) {
         if (!this.chips.includes(item)) {
           if (
-            this.constraints.every((e) => this.items[item].includes(e)) !==
-            undefined
+            this.constraints.some((e) => this.items[item].includes(e)) 
           ) {
             keys.push(item);
           }
         }
       } else {
         if (
-          this.constraints.every((e) => this.items[item].includes(e)) !==
-          undefined
+          this.constraints.every((e) => this.items[item].includes(e))
         ) {
           keys.push(item);
         }
@@ -93,14 +90,39 @@ class AutoComplete {
   }
 
   addToChips(label) {
-    let old = [...this.chips];
     this.chips.push(label);
+    let chipsConstraints = this.chips.map((chip) => this.items[chip]) || [];
+
+    // recuperer la taille des contraintes recupérér 
+    let nbConstraints = chipsConstraints.length;
+
+    // on fait un seul tableau avec notre tableau de tableau (chipsConstraints)
+    // [1, 22, 22, 5, ]
+    let countConstraints = {};
+    for(const num of chipsConstraints.flat()){
+      countConstraints[num] = countConstraints[num] ? countConstraints[num] + 1 : 1;
+    }
+    let arrayConstraints = [];
+    
+    console.log(Object.entries(countConstraints))
+    for(const [idConstraint, nbcount] of Object.entries(countConstraints)) {
+    // console.log(idConstraint, nbcount)
+    if(nbcount === nbConstraints) {
+      // console.log(idConstraint)
+      arrayConstraints = [...arrayConstraints, +idConstraint]
+    }
+    }
+    this.constraints = arrayConstraints;
+    // compter le nombre qu'on récupère les elements []
+
+    console.log(arrayConstraints)
 
     this.chipsEventFunction(
-      this.getConstraints(this.chips),
-      this.getConstraints(old),
+      this.constraints,
+      [],
       "add"
     );
+    console.log(this.constraints)
     this.filteredItems = this.getItems();
 
     this.generateChips();
@@ -108,19 +130,27 @@ class AutoComplete {
   }
 
   addToList(label) {
-    if (label.includes(this.text)) {
-      this.filteredItems.push(label);
-    }
-    let old = [...this.chips];
-
     this.chips.splice(this.chips.indexOf(label), 1);
+    let chipsConstraints = this.chips.map((chip) => this.items[chip]) || [];
+    console.log(chipsConstraints);
+    let nbConstraints = chipsConstraints.length;
 
+    let countConstraints = {};
+    for(const num of chipsConstraints.flat()){
+      countConstraints[num] = countConstraints[num] ? countConstraints[num] + 1 : 1;
+    }
+    let arrayConstraints = [];    
+    for(const [idConstraint, nbcount] of Object.entries(countConstraints)) {
+      if(nbcount === nbConstraints) {
+        arrayConstraints = [...arrayConstraints, +idConstraint]
+      }
+    }
+    this.constraints = arrayConstraints;
     this.chipsEventFunction(
-      this.getConstraints(this.chips),
-      this.getConstraints(old),
-      "remove"
+      this.constraints,
+      [],
+      "add"
     );
-
     this.generateChips();
     this.generateList();
   }
