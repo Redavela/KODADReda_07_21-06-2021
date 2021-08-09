@@ -89,8 +89,7 @@ class AutoComplete {
     return [...new Set(chipsConstraints.reduce((a, e) => a.concat(e)))];
   }
 
-  addToChips(label) {
-    this.chips.push(label);
+  constraintsInArray(){
     let chipsConstraints = this.chips.map((chip) => this.items[chip]) || [];
 
     // recuperer la taille des contraintes recupérér 
@@ -123,36 +122,20 @@ class AutoComplete {
       "add"
     );
     console.log(this.constraints)
-    this.filteredItems = this.getItems();
 
     this.generateChips();
     this.generateList();
   }
 
+  addToChips(label) {
+    this.chips.push(label);
+    this.constraintsInArray()
+    this.filteredItems = this.getItems();
+  }
+
   addToList(label) {
     this.chips.splice(this.chips.indexOf(label), 1);
-    let chipsConstraints = this.chips.map((chip) => this.items[chip]) || [];
-    console.log(chipsConstraints);
-    let nbConstraints = chipsConstraints.length;
-
-    let countConstraints = {};
-    for(const num of chipsConstraints.flat()){
-      countConstraints[num] = countConstraints[num] ? countConstraints[num] + 1 : 1;
-    }
-    let arrayConstraints = [];    
-    for(const [idConstraint, nbcount] of Object.entries(countConstraints)) {
-      if(nbcount === nbConstraints) {
-        arrayConstraints = [...arrayConstraints, +idConstraint]
-      }
-    }
-    this.constraints = arrayConstraints;
-    this.chipsEventFunction(
-      this.constraints,
-      [],
-      "add"
-    );
-    this.generateChips();
-    this.generateList();
+    this.constraintsInArray()
   }
 
   generateChips() {
