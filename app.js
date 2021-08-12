@@ -1,6 +1,6 @@
 const searchButton = document.getElementById("submit-btn");
 let searchTerm = "";
-const container = document.querySelector(".container");
+const container = document.querySelector(".list-card");
 const filters = new Filters(() => {
   createCard();
 });
@@ -27,11 +27,11 @@ function createCard() {
                     ${recette.ingredients
                       .map(
                         (element) =>
-                          `<div><span><b>${element.ingredient}: </b></span>
+                          `<div><span><b>${element.ingredient} </b></span>
                          <span>${
-                           "quantity" in element ? element.quantity : ""
+                           "quantity" in element ?"<b>: </b>" + element.quantity : ""
                          } </span>
-                         <span>${"unit" in element ? element.unit : ""}</span>
+                         <span>${"unit" in element ? " " + element.unit : ""}</span>
                          </div>`
                       )
                       .join("")}
@@ -79,6 +79,7 @@ function algoRecherche(combinaisons, text) {
       result[key].map((elem) => extractParentId(elem.parent))
     );
   }
+  console.log(this)
   return [...new Set(resConstraints)];
 }
 
@@ -96,6 +97,8 @@ function extractParentId(parent) {
 searchButton.addEventListener("click", (e) => {
   e.preventDefault();
   const searchInput = document.getElementById("search-input");
+  filters.clearChips();
+
   let result = algoRecherche(
     ["name", "ingredient", "description"],
     searchInput.value

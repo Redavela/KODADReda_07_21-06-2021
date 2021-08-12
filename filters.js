@@ -1,48 +1,4 @@
 class Filters {
-  arrayDifference(a, b) {
-    return a
-      .filter((x) => !b.includes(x))
-      .concat(b.filter((x) => !a.includes(x)));
-  }
-
-  mergeConstraints(newConstraints, oldConstraints, type) {
-    this.constraints = newConstraints;
-    console.log(this.constraints, newConstraints)
-    // if (type === "add") {
-    //   this.constraints = [
-    //     ...new Set(
-    //       this.constraints
-    //         .filter((c) => newConstraints.includes(c))
-    //         .concat(diff)
-    //     ),
-    //   ];
-    // } else if (type === "remove") {
-    //   this.constraints = this.appareilsAutocomplete.getChipsConstraints();
-    //   if (this.constraints.length === 0) {
-    //     this.constraints = this.ingredientsAutocomplete.getChipsConstraints();
-    //   } else {
-    //     let tc = this.ingredientsAutocomplete.getChipsConstraints();
-    //     if (tc.length > 0) {
-    //       this.constraints = this.constraints.filter((c) => tc.includes(c));
-    //     }
-    //   }
-    //   if (this.constraints.length === 0) {
-    //     this.constraints = this.ustensilesAutocomplete.getChipsConstraints();
-    //   } else {
-    //     let tc = this.ustensilesAutocomplete.getChipsConstraints();
-    //     if (tc.length > 0) {
-    //       this.constraints = this.constraints.filter((c) => tc.includes(c));
-    //     }
-    //   }
-
-    //   this.constraints = [...new Set(this.constraints)];
-    // }
-    this.updateFunction();
-    this.ingredientsAutocomplete.updateConstraints(this.constraints);
-    this.appareilsAutocomplete.updateConstraints(this.constraints);
-    this.ustensilesAutocomplete.updateConstraints(this.constraints);
-  }
-
   constructor(updateFunction) {
     this.constraints = [];
 
@@ -68,28 +24,111 @@ class Filters {
     );
 
     this.ingredientsAutocomplete.setChipsEventFunction(
-      (newConstraints, oldConstraints, type) => {
-        this.mergeConstraints(newConstraints, oldConstraints, type);
+      (newConstraints, id) => {
+        this.mergeConstraints(newConstraints, id);
       }
     );
 
     this.appareilsAutocomplete.setChipsEventFunction(
-      (newConstraints, oldConstraints, type) => {
+      (newConstraints, id) => {
         console.log(this.constraints, newConstraints, 'test before merge')
-        this.mergeConstraints(newConstraints, oldConstraints, type);
+        this.mergeConstraints(newConstraints, id);
       }
     );
 
     this.ustensilesAutocomplete.setChipsEventFunction(
-      (newConstraints, oldConstraints, type) => {
-        this.mergeConstraints(newConstraints, oldConstraints, type);
+      (newConstraints, id) => {
+        this.mergeConstraints(newConstraints, id);
       }
     );
+
+
+ 
+    this.ingredientsAutocomplete.otherFilters = [this.ustensilesAutocomplete,  this.appareilsAutocomplete];
+  
+    this.ustensilesAutocomplete.otherFilters= [this.ingredientsAutocomplete,  this.appareilsAutocomplete];
+
+    this.appareilsAutocomplete.otherFilters = [this.ustensilesAutocomplete,  this.ingredientsAutocomplete];
+    
+  
     this.updateFunction = updateFunction;
+  }
+
+
+  arrayDifference(a, b) {
+    return a
+      .filter((x) => !b.includes(x))
+      .concat(b.filter((x) => !a.includes(x)));
+  }
+
+  mergeConstraints(newConstraints, id) {
+
+    if (id === '#appareils') {
+      this.appareilsAutocomplete.ownConstraints = newConstraints;
+      console.log(this.appareilsAutocomplete.ownConstraints, 'appareils')
+    }
+    if (id === '#ustensiles') {
+      this.ustensilesAutocomplete.ownConstraints = newConstraints;
+      console.log(this.ustensilesAutocomplete.ownConstraints, 'ustensile')
+
+    }
+    if (id === '#ingredients') {
+      this.ingredientsAutocomplete.ownConstraints = newConstraints;
+      console.log(this.ingredientsAutocomplete.ownConstraints, 'ingredients')
+    }
+
+    let valueAppareilConstraints = this.appareilsAutocomplete.ownConstraints.length > 0 ? 1 : 0;
+    let valueUstensilsConstraints = this.ustensilesAutocomplete.ownConstraints.length > 0 ? 1 : 0;
+    let valueIngredientsConstraints = this.ingredientsAutocomplete.ownConstraints.length > 0 ? 1 : 0;
+    console.log(valueAppareilConstraints,valueUstensilsConstraints,valueIngredientsConstraints)
+    console.log(valueAppareilConstraints+valueUstensilsConstraints+valueIngredientsConstraints)
+
+    let totalConstraints = valueAppareilConstraints + valueUstensilsConstraints + valueIngredientsConstraints;
+
+    
+    console.log((this.appareilsAutocomplete.ownConstraints.length > 0) ? 1 : 0 + (this.ingredientsAutocomplete.ownConstraints.length > 0) ? 1 : 0)
+    // console.log(this.appareilsAutocomplete.ownConstraints, this.ustensilesAutocomplete.ownConstraints,  this.ingredientsAutocomplete.ownConstraints)
+    let allConstraints = [...this.appareilsAutocomplete.ownConstraints, ...this.ustensilesAutocomplete.ownConstraints, ...this.ingredientsAutocomplete.ownConstraints];
+
+    let countConstraints = {};
+    for (const num of allConstraints) {
+      countConstraints[num] = countConstraints[num]
+        ? countConstraints[num] + 1
+        : 1;
+    }
+
+
+console.log(countConstraints, totalConstraints);
+    let arrayConstraints = [];
+
+    for (const [idConstraint, nbcount] of Object.entries (countConstraints)) {
+      if (nbcount === totalConstraints) {
+        arrayConstraints = [...arrayConstraints, +idConstraint];
+      }
+    }
+    
+
+    this.constraints = arrayConstraints;
+
+    this.updateFunction();
+    this.ingredientsAutocomplete.updateConstraints(arrayConstraints);
+    this.appareilsAutocomplete.updateConstraints(arrayConstraints);
+    this.ustensilesAutocomplete.updateConstraints(arrayConstraints);
+  }
+
+  clearChips(){
+    this.ingredientsAutocomplete.chips = [];
+    this.appareilsAutocomplete.chips = [];
+    this.ustensilesAutocomplete.chips = [];
   }
 
   updateSearchBarConstraints(constraints) {
     this.constraints = constraints;
+
+    this.ustensilesAutocomplete.ownConstraints = constraints;
+    this.ingredientsAutocomplete.ownConstraints = constraints;
+    this.appareilsAutocomplete.ownConstraints = constraints;
+
     this.ustensilesAutocomplete.updateConstraints(constraints);
     this.ingredientsAutocomplete.updateConstraints(constraints);
     this.appareilsAutocomplete.updateConstraints(constraints);
@@ -98,15 +137,15 @@ class Filters {
  
   generateIngredientsList() {
     let ingredients = {};
-    let recipesToUse = recipes.filter((recipe) =>
-    this.constraints.includes(recipe.id)
-    );
+    let recipesToUse = [];
     if (this.constraints.length === 0) {
       recipesToUse = recipes;
     }
-    console.log(recipes)
-    console.log(recipesToUse)
-    console.log(this.constraints)
+    else {
+    recipesToUse = recipes.filter((recipe) =>
+    this.constraints.includes(recipe.id)
+    );
+    }
     recipesToUse.forEach((recipe) => {
       recipe.ingredients.forEach((ingredientObj) => {
         const ingredient = ingredientObj.ingredient.toLowerCase();
@@ -114,14 +153,22 @@ class Filters {
         ingredients[ingredient].push(recipe.id);
       });
     });
-    console.log(ingredients)
     return ingredients;
   }
 
   generateApplianceList() {
     let appareils = {};
 
-    recipes.forEach((recipe) => {
+    let recipesToUse = [];
+    if (this.constraints.length === 0) {
+      recipesToUse = recipes;
+    }
+    else {
+    recipesToUse = recipes.filter((recipe) =>
+    this.constraints.includes(recipe.id)
+    );
+    }
+    recipesToUse.forEach((recipe) => {
       const appareil = recipe.appliance.toLowerCase();
       appareils[appareil] = appareils[appareil] || [];
       appareils[appareil].push(recipe.id);
@@ -131,8 +178,16 @@ class Filters {
 
   generateUstensilesList() {
     let ustensiles = {};
-
-    recipes.forEach((recipe) => {
+    let recipesToUse = [];
+    if (this.constraints.length === 0) {
+      recipesToUse = recipes;
+    }
+    else {
+    recipesToUse = recipes.filter((recipe) =>
+    this.constraints.includes(recipe.id)
+    );
+    }
+    recipesToUse.forEach((recipe) => {
       recipe.ustensils.forEach((ustensile) => {
         ustensile = ustensile.toLowerCase();
         ustensiles[ustensile] = ustensiles[ustensile] || [];
