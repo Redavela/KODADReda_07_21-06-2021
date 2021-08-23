@@ -233,13 +233,13 @@ class AutoComplete {
       : 'none';
     let parentDivId = document.querySelector(this.id).parentNode;
 
-    parentDivId.className = this.showList ? 'col-sm-6' : 'col-sm-2';
+    parentDivId.className = this.showList ? 'col-lg-6' : 'col-lg-2 sm-3';
    
     filterToHide.forEach(filterId => {
       let otherParentDivId = document.querySelector(filterId).parentNode;
-      if (otherParentDivId.className === 'col-sm-6') {
+      if (otherParentDivId.className === 'col-sm-3') {
         document.querySelector (`${filterId} .ac-body`).style.display = 'none';
-        otherParentDivId.className ='col-2';
+        otherParentDivId.className ='col-lg-2';
         document.querySelector (`${filterId} .ac-header i`).style.transform = `rotate(0deg)`;
         const filterToUpdate = this.otherFilters.find(filterObject => filterObject.id === filterId)
         filterToUpdate.showList = !filterToUpdate.showList
