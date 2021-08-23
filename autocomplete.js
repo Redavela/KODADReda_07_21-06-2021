@@ -237,9 +237,9 @@ class AutoComplete {
    
     filterToHide.forEach(filterId => {
       let otherParentDivId = document.querySelector(filterId).parentNode;
-      if (otherParentDivId.className === 'col-sm-3') {
+      if (otherParentDivId.className === 'col-lg-6') {
         document.querySelector (`${filterId} .ac-body`).style.display = 'none';
-        otherParentDivId.className ='col-lg-2';
+        otherParentDivId.className ='col-2';
         document.querySelector (`${filterId} .ac-header i`).style.transform = `rotate(0deg)`;
         const filterToUpdate = this.otherFilters.find(filterObject => filterObject.id === filterId)
         filterToUpdate.showList = !filterToUpdate.showList
