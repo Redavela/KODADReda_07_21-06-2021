@@ -1,6 +1,13 @@
-# KODADReda_07_21-06-2021
-Projet numéro 7  : Utilisation de bootstrap et des algorithmes de recherche JS
+# OPENCLASSROOMS PROJECT 7
+Build a searching algorithm in JavaScript
 
-Objectif: créer un site de recette de cuisine avec un moteur de recherche fluide
+# Technologies used
+HTML5
+CSS
+VanillaJS
 
-Tester deux algo différent et choisir le meilleur des deux avec l'outil de comparaison Jsben.ch
+# Objectif: 
+create a cooking recipe site with a smooth search engine
+
+# Test
+Test two different algorithms and choose the best of the two with the Jsben.ch comparison tool
